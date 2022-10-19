@@ -1,22 +1,13 @@
 # cmake -DBOOST_ROOT=path_to_boost_include -DBOOST_LIBRARYDIR=path_to_boost_lib -DCMAKE_BUILD_TYPE=Release|Debug .
-
-
 cmake_minimum_required(VERSION 3.5)
-
-# make Release as default
-if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
-    if (NOT CMAKE_BUILD_TYPE)
-        set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
-    endif()
-endif()
-
-set (CMAKE_CXX_STANDARD 11)
 
 project(promise)
 
 # build shared option
 option(PROMISE_BUILD_SHARED "Build shared library" OFF)
-option(PROMISE_BUILD_EXAMPLES "Build examples" ON)
+option(PROMISE_BUILD_EXAMPLES "Build examples" OFF)
+option(PROMISE_ENABLE_QT "Build with qt support" OFF)
+option(PROMISE_ENABLE_BOOST "Build with boost support" ON)
 
 set(my_headers
     include/promise-cpp/promise.hpp
@@ -40,29 +31,33 @@ endif()
 
 target_include_directories(promise PUBLIC include .)
 
-find_package(Boost)
-if(NOT Boost_FOUND)
-    message(WARNING "Boost not found, so asio projects will not be compiled")
-else()
-    target_include_directories(promise PUBLIC ${Boost_INCLUDE_DIRS})
-    if(UNIX)
-        target_link_libraries(promise PUBLIC pthread)
-    elseif(WIN32)
-        target_link_libraries(promise PUBLIC -lws2_32 -lmswsock)
+if (PROMISE_ENABLE_BOOST)
+    find_package(Boost)
+    if(NOT Boost_FOUND)
+        message(WARNING "Boost not found, so asio projects will not be compiled")
+    else()
+        target_include_directories(promise PUBLIC ${Boost_INCLUDE_DIRS})
+        if(UNIX)
+            target_link_libraries(promise PUBLIC pthread)
+        elseif(WIN32)
+            target_link_libraries(promise PUBLIC -lws2_32 -lmswsock)
+        endif()
     endif()
 endif()
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets)
-if(NOT QT_FOUND)
-    message(WARNING "QT not found, so project qt_timer will not be compiled")
-else()
-    if(PROMISE_BUILD_SHARED OR BUILD_SHARED_LIBS)
-        add_library(promise_qt SHARED ./add_ons/qt/promise_qt.cpp ${my_headers})
+if (PROMISE_ENABLE_QT)
+    find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets)
+    find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets)
+    if(NOT QT_FOUND)
+        message(WARNING "QT not found, so project qt_timer will not be compiled")
     else()
-        add_library(promise_qt STATIC ./add_ons/qt/promise_qt.cpp ${my_headers})
+        if(PROMISE_BUILD_SHARED OR BUILD_SHARED_LIBS)
+            add_library(promise_qt SHARED ./add_ons/qt/promise_qt.cpp ${my_headers})
+        else()
+            add_library(promise_qt STATIC ./add_ons/qt/promise_qt.cpp ${my_headers})
+        endif()
+        target_link_libraries(promise_qt PUBLIC promise Qt${QT_VERSION_MAJOR}::Widgets)
     endif()
-    target_link_libraries(promise_qt PUBLIC promise Qt${QT_VERSION_MAJOR}::Widgets)
 endif()
 
 if(PROMISE_BUILD_EXAMPLES) 
