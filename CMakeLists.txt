@@ -23,8 +23,8 @@ set(my_sources
 )
 
 if(PROMISE_BUILD_SHARED OR BUILD_SHARED_LIBS)
-    target_compile_definitions(promise PUBLIC -DPROMISE_BUILD_SHARED)
     add_library(promise SHARED ${my_sources} ${my_headers})
+    target_compile_definitions(promise PUBLIC -DPROMISE_BUILD_SHARED)
 else()
     add_library(promise STATIC ${my_sources} ${my_headers})
 endif()
