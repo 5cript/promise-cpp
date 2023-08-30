@@ -22,7 +22,7 @@ set(my_sources
     Readme.md
 )
 
-if(PROMISE_BUILD_SHARED OR BUILD_SHARED_LIBS)
+if(PROMISE_BUILD_SHARED)
     add_library(promise SHARED ${my_sources} ${my_headers})
     target_compile_definitions(promise PUBLIC -DPROMISE_BUILD_SHARED)
 else()
@@ -51,7 +51,7 @@ if (PROMISE_ENABLE_QT)
     if(NOT QT_FOUND)
         message(WARNING "QT not found, so project qt_timer will not be compiled")
     else()
-        if(PROMISE_BUILD_SHARED OR BUILD_SHARED_LIBS)
+        if(PROMISE_BUILD_SHARED)
             add_library(promise_qt SHARED ./add_ons/qt/promise_qt.cpp ${my_headers})
         else()
             add_library(promise_qt STATIC ./add_ons/qt/promise_qt.cpp ${my_headers})
