@@ -36,6 +36,12 @@
 #include "add_ons.hpp"
 #include "call_traits.hpp"
 
+#include <vector>
+#include <exception>
+#include <utility>
+#include <type_traits>
+#include <tuple>
+
 namespace promise {
 
 // Any library
