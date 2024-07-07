@@ -1,5 +1,5 @@
 # cmake -DBOOST_ROOT=path_to_boost_include -DBOOST_LIBRARYDIR=path_to_boost_lib -DCMAKE_BUILD_TYPE=Release|Debug .
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.21)
 
 project(promise)
 
@@ -32,7 +32,11 @@ endif()
 target_include_directories(promise PUBLIC include .)
 
 if (PROMISE_ENABLE_BOOST)
-    find_package(Boost)
+    if (CMAKE_VERSION VERSION_LESS "3.29")
+        find_package(Boost)
+    else()
+        find_package(Boost CONFIG)
+    endif()
     if(NOT Boost_FOUND)
         message(WARNING "Boost not found, so asio projects will not be compiled")
     else()
