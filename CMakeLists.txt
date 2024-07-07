@@ -32,7 +32,7 @@ endif()
 target_include_directories(promise PUBLIC include .)
 
 if (PROMISE_ENABLE_BOOST)
-    if (CMAKE_VERSION VERSION_LESS "3.29")
+    if (CMAKE_VERSION VERSION_LESS "3.30")
         find_package(Boost)
     else()
         find_package(Boost CONFIG)
